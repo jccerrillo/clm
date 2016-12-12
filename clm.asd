@@ -6,7 +6,8 @@
   :author "William Schottstaedt <bil (at) ccmra (dot) stanford (dot) edu>"
   :licence "LLGPL"
   :serial t
-  :components ((:file "comp-load")
+  :components ((:file "dir-setup")
+	       (:file "comp-load")
 	       #-(or excl sbcl)(:file "walk")
 	       (:file "package")
 	       (:file "all1" )
