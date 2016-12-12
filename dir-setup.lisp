@@ -12,11 +12,12 @@
 	(directory-namestring (or *load-pathname* "./"))))))
 
 
+#+quicklisp
+(setf clm-directory (namestring (ql:where-is-system :clm)))
+
 #+openmcl (if (and (stringp clm-directory)
 		   (> (length clm-directory) 0)
 		   (not (char= (elt clm-directory (1- (length clm-directory))) #\/)))
 	      (setf clm-directory (concatenate 'string clm-directory "/")))
 
-#+quicklisp
-(setf clm-directory (namestring (ql:where-is-system :clm)))
 (if (not (boundp 'clm-bin-directory)) (setf clm-bin-directory clm-directory))
