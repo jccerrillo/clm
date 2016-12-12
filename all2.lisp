@@ -1,6 +1,22 @@
-(when (find-symbol "WALK-FORM-EXPAND-MACROS-P" :walker)
-	  (set (find-symbol "WALK-FORM-EXPAND-MACROS-P" :walker) t))
+;;; --------------------------------
+;;; code walker, package definitions, etc
 
+#-(or excl sbcl)
+  (if (not (find-package :walker))
+      (progn
+	;; (compile-and-load "walk")
+	;; now check for later versions that do not automatically expand macros during the walk (taken from Common Music's build.lisp)
+	(when (find-symbol "WALK-FORM-EXPAND-MACROS-P" :walker)
+	  (set (find-symbol "WALK-FORM-EXPAND-MACROS-P" :walker) t))
+	#+(and (or clisp cmu) ansi-cl) (load (concatenate 'string clm-directory "special-form-for-cmu.cl"))
+	))
+
+#+cmu (setf walker:walk-form-expand-macros-p t)
+;;; in sbcl it's in the SB-WALKER package (&#%@^$)
+#|
+(compile-and-load "clm-package")
+(compile-and-load "initmus")
+|#
 
 (setf clm::*clm-binary-directory* (namestring (truename clm-bin-directory)))
 (setf clm::*clm-source-directory* (namestring (truename clm-directory)))
