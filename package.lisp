@@ -4,7 +4,6 @@
   (:use #:cl)
   (:nicknames :clm)
   #+ccl(:import-from :walker walk-form)
-  #+ccl(:import-from :cl-user compile-and-load)
   #+ccl(:import-from :ccl quit %get-cstring)
   #+sbcl (:import-from :sb-walker walk-form)
   #+sbcl (:import-from :sb-ext quit)
