@@ -1,3 +1,4 @@
+#+quicklisp
 (asdf:defsystem #:clm
   :name "clm"
   :version "5"
@@ -25,3 +26,10 @@
 	       (:file "play-stop-sound")
 	       (:file "all-end")))
 
+#-quicklisp
+(asdf:defsystem "clm"
+  :description "Common Lisp Music"
+  :version "3"
+  :author "William Schottstaedt <bil (at) ccmra (dot) stanford (dot) edu>"
+  :licence "LLGPL"
+  :components ((:file "all" )))
