@@ -30,3 +30,9 @@
 	(close init-file))))
   
 ;;; see README.clm for current status
+
+#+lispworks
+(change-directory "~")
+
+#+mac-osx
+(format t "~%Using sndplay as *clm-player*.~%If playback samplerate is not correct, consider using afplay by evaluating:~%(setf *clm-player* \"afplay\"~%")

@@ -2,22 +2,12 @@
 ;;;  setup clm-directory 
 ;;;
 
-(proclaim '(special clm-directory clm-bin-directory))
+(defparameter *clm-src-dir*
+  (asdf:component-pathname (asdf:find-system :clm))
+  "Directory holding CLM source files")
 
-#-quicklisp
-(if (not (boundp 'clm-directory)) 
-    (setf clm-directory 
-      (namestring
-       (truename 
-	(directory-namestring (or *load-pathname* "./"))))))
+(defparameter clm-directory (namestring *clm-src-dir*))
+(defparameter clm-bin-directory (namestring *clm-src-dir*))
 
-
-#+quicklisp
-(setf clm-directory (namestring (ql:where-is-system :clm)))
-
-#+openmcl (if (and (stringp clm-directory)
-		   (> (length clm-directory) 0)
-		   (not (char= (elt clm-directory (1- (length clm-directory))) #\/)))
-	      (setf clm-directory (concatenate 'string clm-directory "/")))
-
-(if (not (boundp 'clm-bin-directory)) (setf clm-bin-directory clm-directory))
+#+lispworks
+(change-directory clm-directory)

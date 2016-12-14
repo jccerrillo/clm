@@ -1,7 +1,7 @@
 ;;; --------------------------------
 ;;; code walker, package definitions, etc
 
-#-(or excl sbcl)
+#-(or excl sbcl lispworks)
 (progn
   (when (find-symbol "WALK-FORM-EXPAND-MACROS-P" :walker)
     (set (find-symbol "WALK-FORM-EXPAND-MACROS-P" :walker) t))
@@ -54,6 +54,73 @@
 
 ;;; -------- sndplay
 ;;; make a program named sndplay (and sndinfo and audinfo?) that can play most sound files 
+;;;
+
+; TODO
+; a new configure and compiling of libraries is needed if one is working on 32bit lisp on 64 bit machine (lw-personal)
+; otherwise sndplay is not properly built
+;
+
+
+#+lispworks-32bit
+(defun touch-file (file)
+  (sys:run-shell-command (concatenate 'string "touch " file)))
+
+#+lispworks-32bit
+(progn
+    (let* ((c-file-names '("io" "headers" "audio" "sound" "clm" "cmus"))
+	   (c-files (mapcar #'(lambda (x) (concatenate 'string clm-directory x ".c")) c-file-names)))
+      (mapcar #'touch-file c-files)
+      (setf configure (concatenate 'string "cd " clm-directory " && ./configure --quiet"))
+      ;#+lispworks-32bit (setf configure (concatenate 'string configure " --host=i686"))
+      (format t ";   running ~A~%" configure)
+      #+lispworks (sys::call-system-showing-output configure)
+      (defvar *cflags* (concatenate 'string " -I" clm-directory " -O2"
+				  #-windoze " -g"
+				  #+(or macosx (and mac-osx openmcl)) " -no-cpp-precomp"
+				  ))
+      (defvar *csoflags* (concatenate 'string
+				      #+macosx " -shared"
+				      ))
+    (format t "~%Compiling headers for lw agian~%")
+    (cc-it "io")
+    (cc-it "headers")
+    (cc-it "audio")
+    (cc-it "sound")
+    (cc-it "clm")
+    (cc-it "cmus"))
+#|
+    (let ((shared-name (concatenate 'string clm-bin-directory "libclm." *shared-object-extension*)))
+      (princ (format nil "; Creating ~S~%" shared-name))
+      (setf someone-loaded t)
+      (let ((str (concatenate 
+		  'string
+		  *ld* " "
+		  #-(and cmu freebsd) *csoflags* " "
+		  #-windoze "-o " #+windoze "-Fe"
+		  shared-name " "
+		  clm-bin-directory "headers" *obj-ext* " "
+		  clm-bin-directory "audio" *obj-ext* " "
+		  clm-bin-directory "io" *obj-ext* " "
+		  clm-bin-directory "sound" *obj-ext* " "
+		  clm-bin-directory "clm" *obj-ext* " "
+		  clm-bin-directory "cmus" *obj-ext* " "
+		  #-(or windoze (and openmcl linuxppc-target) (and linux (or cmu sbcl acl-50))) " -lm -lc"
+		  #+(or mac-osx os-macosx) " -framework CoreAudio"
+		  )))
+	(format t ";;~A~%" str)
+	(force-output)
+	#+lispworks (sys::run-shell-command str)
+	(if (not (probe-file shared-name))
+	    (format t "~S was not created?  Perhaps there was a C compiler or loader error.~%~
+                     You might try the following command in a terminal to see what happened: ~S~%"
+		    shared-name
+		  str))))
+|#
+    )
+
+
+
 #+windoze
   (when (or (not (probe-file "sndplay.exe"))
 	    (> (file-write-date "sndplay.c") (file-write-date "sndplay.exe")))

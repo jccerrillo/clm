@@ -2,7 +2,7 @@
 
 (defpackage #:clm 
   (:use #:cl)
-  (:nicknames :clm)
+  ;(:nicknames :clm)
   #+ccl(:import-from :walker walk-form)
   #+ccl(:import-from :ccl quit %get-cstring)
   #+sbcl (:import-from :sb-walker walk-form)

@@ -149,8 +149,8 @@ The *features* that CLM adds itself are:
   #+dlfcn "so" 
   #+dlhp "sl" 
   #+(or windoze dlwin) "dll" 
-  #+(or (and excl macosx) (and openmcl (not linux-target) (not linuxppc-target))) "dylib"
-  #-(or dlfcn dlhp dlwin windoze (and excl macosx) (and openmcl (not linux-target) (not linuxppc-target))) "so"
+  #+(or (and lispworks macosx) (and excl macosx) (and openmcl (not linux-target) (not linuxppc-target))) "dylib"
+  #-(or dlfcn dlhp dlwin windoze (and lispworks macosx) (and excl macosx) (and openmcl (not linux-target) (not linuxppc-target))) "so"
   )
 
 (defvar pre-c-name #-windoze "saved-" #+windoze "n")
@@ -171,11 +171,13 @@ The *features* that CLM adds itself are:
 
 #+alsa (if (probe-file "/usr/include/alsa/asoundlib.h") (setf *cflags* (concatenate 'string *cflags* " -DHAVE_ALSA_ASOUNDLIB_H")))
 
+#+linuxppc-target
 (defvar *csoflags* (concatenate 'string
 				#+sgi " -shared -all"
 				#+(or (and linux (not lispworks-32bit)) clisp ) " -shared -fPIC"
-				#+(or linuxppc-target (and mac-osx (not excl) (not cmu) (not sbcl) (not openmcl))) " -shared -whole-archive"
-				#+(and lispworks-32bit) "-L/usr/lib -m32 --shared"
+				#+(and (not macosx) (not excl) (not cmu) (not sbcl) (not openmcl)) " -shared -whole-archive"
+				#+(or linuxppc-target (and mac-osx (not excl) (not cmu) (not sbcl) (not openmcl))) " -L /usr/lib -m32 --shared"
+				#+(and lispworks-32bit macosx) " -m32 --shared"
 				#+(and openmcl linux-target) " -shared"
 				#+(and mac-osx cmu) " -dynamiclib"
 				#+(and excl macosx) " -bundle /usr/lib/bundle1.o -flat_namespace -undefined suppress"
@@ -185,6 +187,23 @@ The *features* that CLM adds itself are:
 				#+(and excl freebsd) " -Bshareable -Bdynamic"
 				#+netbsd " -shared"
 				))
+
+#-linuxppc-target
+(defvar *csoflags* (concatenate 'string
+				#+sgi " -shared -all"
+				#+(or (and linux (not lispworks-32bit)) clisp ) " -shared -fPIC"
+				#+(and (not macosx) (not excl) (not cmu) (not sbcl) (not openmcl)) " -shared -whole-archive"
+				#+(and lispworks-32bit macosx) " -m32 --shared"
+				#+(and openmcl linux-target) " -shared"
+				#+(and mac-osx cmu) " -dynamiclib"
+				#+(and excl macosx) " -bundle /usr/lib/bundle1.o -flat_namespace -undefined suppress"
+				#+hpux " +z -Ae +DA1.1" ;" -b"?
+				#+sun " -G"
+				#+windoze " -D_MT -MD -nologo -LD -Zi -W3"
+				#+(and excl freebsd) " -Bshareable -Bdynamic"
+				#+netbsd " -shared"
+				))
+
 
 (defvar *lib-ext* #+windoze "lib" #-windoze "a")
 (defvar *ld* #+windoze "cl" 

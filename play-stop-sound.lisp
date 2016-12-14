@@ -1,15 +1,17 @@
 ;;;
-;;; This modifies the definitions of play, dac, stop-playing, stop-dac from sound.lisp
-;;; in order to have all functions available in ccl
+;;; This modifies the definitions of play and stop-playing from sound.lisp to be able to use something like apple's afplay
+;;; by evaluating (setf *clm-player* "afplay")
 ;;;
+;;; sndplay changes the samplerate of some soundcards when called, thus plays sounds with wrong frequencies
+;;; 
 
 (in-package :clm)
 
-
+#+(or (and ccl mac-osx) (and lispworks mac-osx) (and sbcl mac-osx))
+(defparameter *dac-pid* nil)
 (defvar last-dac-filename #-(or cmu sbcl openmcl) nil #+(or cmu sbcl openmcl) *clm-file-name*)
-#+(or excl cmu sbcl ccl) (defvar *dac-pid* nil)
 
-
+#+(or (and ccl mac-osx) (and lispworks mac-osx) (and sbcl mac-osx))
 (defun play (&optional name-1 &key start end (wait *clm-dac-wait-default*))
   #-(or excl openmcl cmu sbcl) (declare (ignore wait))
   (clm-initialize-links)
@@ -59,21 +61,27 @@
 			(if start (format nil " -start ~A" start) "")
 			(if end (format nil " -end ~A" end) ""))
 		))
-	  (when (not (probe-file sndplay))
-	    (setf sndplay "sndplay")) ; hope there's a system version, I guess
+	  
+	  ;; following lines ommited to be able to set "afplay"
+
+	  ;;(when (not (probe-file sndplay))
+	  ;;  (setf sndplay "sndplay")) ; hope there's a system version, I guess
+
 	  ;;
 	  ;; SNDPLAY
-	  #-(or excl openmcl cmu sbcl)
+	  #-(or excl openmcl cmu sbcl lispworks)
 	  (run-in-shell sndplay command-args)
-	  #+openmcl
+	  #+ccl
+	  ;; modified to be able to kill process
 	  (progn
-	    (when *dac-pid* (ccl:signal-external-process *dac-pid* 1 :error-if-exited nil))
-	    (setf *dac-pid* (ccl:run-program sndplay command-args
-					     :output t
-					     :wait wait
-					     :status-hook #'(lambda (x) (progn
+	    (when *dac-pid* (ccl:run-program "kill" (list (write-to-string *dac-pid*))))
+	    (setf *dac-pid* (ccl:external-process-id
+			     (ccl:run-program sndplay command-args
+					      :output t
+					      :wait wait
+					      :status-hook #'(lambda (x) (progn
 									  (print x)
-									  (setf *dac-pid* nil))))))
+									  (setf *dac-pid* nil)))))))
 	  #+(and excl windoze)
 	  (run-in-shell sndplay command-args)
 	  #+(and excl (not windoze))
@@ -90,13 +98,34 @@
 	  #+sbcl
 	  (progn
 	    ;; wait for a previous play command
+	    (if (equal *clm-player* "afplay")
+		(setf sndplay "/usr/bin/afplay"))
 	    (when *dac-pid* (sb-ext:process-wait *dac-pid*))
-	    (setf *dac-pid* (sb-ext:run-program sndplay command-args :wait wait)))
-	  (if filename (setf last-dac-filename filename)))))
+	    (setf *dac-pid* (sb-ext:run-program sndplay
+						(list 
+						 (concatenate
+						  'string
+						  (namestring (user-homedir-pathname))
+						  filename))
+						:wait wait :output t)))
+	  #+lispworks
+	  (progn
+	    (when *dac-pid* (sys:run-shell-command
+			     (concatenate 'string "kill " (write-to-string *dac-pid*))
+			     :wait nil))
+	    (setf *dac-pid* (multiple-value-bind (out err pid)
+				(sys:run-shell-command (concatenate 'string sndplay " " filename)
+						       :wait nil
+						       :output :stream
+						       :if-input-does-not-exist nil)
+			      (values pid))))
+	  (if filename (setf last-dac-filename filename))
+	  (format t "~a ~a" sndplay filename))))
     last-dac-filename))
 
+#+(or (and ccl mac-osx) (and lispworks mac-osx) (and sbcl mac-osx))
 (defun stop-playing ()
-  #+excl (progn
+    #+excl (progn
 	   (print *dac-pid*)
 	   (force-output)
 	   (when *dac-pid*
@@ -117,16 +146,15 @@
     (sb-ext:process-kill *dac-pid* sb-unix::sigterm) ; in sb-unix as of 0.9.8 => use 15 if they move it again
     (sb-ext:process-wait *dac-pid*)
     (setf *dac-pid* nil))
-  #-(or openmcl excl cmu sbcl) (warn "stop-dac not implemented yet")
+  #+lispworks
+  (when *dac-pid*
+    (sys:run-shell-command (concatenate 'string "kill " (write-to-string *dac-pid*))
+			   :wait nil)
+    (setf *dac-pid* nil))
   #+ccl
   (when *dac-pid*
-    (ccl:signal-external-process *dac-pid* 1 :error-if-exited nil)
+    (ccl:run-program "kill" (list (write-to-string *dac-pid*)))
     (setf *dac-pid* nil))
   )
 
-(defun dac (&optional name-1 &key
-		      start end (wait *clm-dac-wait-default*))
-  (play name-1 :start start :end end :wait wait))
 
-(defun stop-dac () (stop-playing))
-	

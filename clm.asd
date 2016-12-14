@@ -8,7 +8,7 @@
   :serial t
   :components ((:file "dir-setup")
 	       (:file "comp-load")
-	       #-(or excl sbcl)(:file "walk")
+	       #-(or excl sbcl lispworks)(:file "walk")
 	       (:file "package")
 	       (:file "all1" )
 	       (:file "initmus")
@@ -34,3 +34,4 @@
   :author "William Schottstaedt <bil (at) ccmra (dot) stanford (dot) edu>"
   :licence "LLGPL"
   :components ((:file "all" )))
+
