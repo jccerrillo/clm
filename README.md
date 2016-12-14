@@ -1,7 +1,7 @@
 # CLM
 A Quicklisp-loadable version of [CLM (Common Lisp Music)](https://ccrma.stanford.edu/software/snd/snd/clm.html).
 
-Currently supports ClozureCL and SBCL only.
+Tested with ClozureCL, SBCL and Lispworks (Personal Edition) on OSX.
 
 Installation:
 
@@ -29,3 +29,5 @@ or something like:
 
 evaluate (play) or (dac) to play the latest sound
 and (stop-play) to stop it.
+
+If you want to load the system on a different lisp, it is easiest to delete everything and install a fresh version.
