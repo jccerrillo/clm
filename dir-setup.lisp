@@ -2,6 +2,8 @@
 ;;;  setup clm-directory 
 ;;;
 
+(in-package :clm)
+
 (defparameter *clm-src-dir*
   (asdf:component-pathname (asdf:find-system :clm))
   "Directory holding CLM source files")

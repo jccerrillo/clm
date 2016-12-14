@@ -6,10 +6,10 @@
   :author "William Schottstaedt <bil (at) ccmra (dot) stanford (dot) edu>"
   :licence "LLGPL"
   :serial t
-  :components ((:file "dir-setup")
+  :components ((:file "package")
+	       (:file "dir-setup")
 	       (:file "comp-load")
 	       #-(or excl sbcl lispworks)(:file "walk")
-	       (:file "package")
 	       (:file "all1" )
 	       (:file "initmus")
 	       (:file "all2")

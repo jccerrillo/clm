@@ -1,3 +1,5 @@
+(in-package :clm)
+
 ;;; --------------------------------
 ;;; code walker, package definitions, etc
 

@@ -1,6 +1,6 @@
 ;;; --------------------------------
 ;;; initialize CLM
-
+(in-package :clm)
 #+sbcl (shadowing-import 'clm:double) ;#%$^#@!!!! 
 (use-package :clm)
 
@@ -35,4 +35,6 @@
 (change-directory "~")
 
 #+mac-osx
-(format t "~%Using sndplay as *clm-player*.~%If playback samplerate is not correct, consider using afplay by evaluating:~%(setf *clm-player* \"afplay\"~%")
+(format t "~%Using sndplay.~%
+If playback samplerate is not correct, consider using afplay by evaluating:~%(setf *clm-player* \"afplay\")~%
+Evaluate (setf *clm-player* nil) to use sndplay once again.~%")

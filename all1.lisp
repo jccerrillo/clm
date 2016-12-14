@@ -13,6 +13,7 @@
 ;;;
 ;;; to force the configure script to run even if mus-config.h exists, (pushnew :reconfigure *features*)
 
+(in-package :clm)
 
 (pushnew :clm2 *features*) ; for CM
 (pushnew :clm3 *features*)
