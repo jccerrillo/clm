@@ -1,4 +1,12 @@
 # CLM
+
+*********************************************************************
+The original CLM from https://ccrma.stanford.edu/software/snd/snd/clm.html is now loadable with ASDF !!!
+None of this is necesary any longer, unless you are using lispworks.
+*********************************************************************
+
+
+
 A Quicklisp-loadable version of [CLM (Common Lisp Music)](https://ccrma.stanford.edu/software/snd/snd/clm.html).
 
 Tested with ClozureCL, SBCL and Lispworks (Personal Edition) on OSX.
