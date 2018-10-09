@@ -1,25 +1,10 @@
 # CLM
 
 *********************************************************************
-The original CLM from https://ccrma.stanford.edu/software/snd/snd/clm.html is now loadable with ASDF !!!
-None of this is necesary any longer, unless you are using lispworks.
+The original CLM from https://ccrma.stanford.edu/software/snd/snd/clm.html is now loadable with ASDF.
+Simply put it in your local directory and (ql:quickload "clm")
 *********************************************************************
 
-
-
-A Quicklisp-loadable version of [CLM (Common Lisp Music)](https://ccrma.stanford.edu/software/snd/snd/clm.html).
-
-Tested with ClozureCL, SBCL and Lispworks (Personal Edition) on OSX.
-
-Installation:
-
-1) Clone or download to ~/quicklisp/local-projects directory.
-
-2) Start your lisp
-
-3) (ql:register-local-projects)
-
-4) (ql:quickload "clm")
 
 
 Once loaded you can do:
@@ -38,4 +23,3 @@ or something like:
 evaluate (play) or (dac) to play the latest sound
 and (stop-play) to stop it.
 
-If you want to load the system on a different lisp, it is easiest to delete everything and install a fresh version.
